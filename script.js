@@ -40,7 +40,7 @@ const loginPasswordInput = document.getElementById('loginPassword');
 const loginError = document.getElementById('loginError');
 const mainAppScreen = document.getElementById('mainAppScreen');
 const loggedInUserIdDisplay = document.getElementById('loggedInUserIdDisplay');
-const firebaseUserIdDisplay = document.getElementById('firebaseUserIdDisplay');
+const firebaseUserIdDisplay 8= document.getElementById('firebaseUserIdDisplay');
 const formTab = document.getElementById('formTab');
 const listTab = document.getElementById('listTab');
 const contactFormSection = document.getElementById('contactFormSection');
@@ -458,7 +458,7 @@ function renderContacts() {
                     populateConnectionsForm(contactToEdit.connections);
                     editingContactId = id;
                     submitButton.textContent = 'Update Contact';
-                    cancelEditButton.classList.remove('hidden');
+                    cancelEditButton.classList.add('hidden');
                     showTab('form'); // Switch to form tab for editing
                     window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to see the form
                 }
