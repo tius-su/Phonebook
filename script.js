@@ -4,9 +4,23 @@ import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthState
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Global variables provided by the environment (these will be available here)
+// NOTE: __app_id and __initial_auth_token are still used as they are specific to the Canvas environment.
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+// Your web app's Firebase configuration - THIS IS NOW HARDCODED WITH YOUR PROVIDED VALUES
+// WARNING: For actual production apps, consider environment variables or server-side injection
+// for sensitive keys if you were to use other APIs that are not publicly safe.
+// Firebase API keys are generally safe to be public as security is handled by Security Rules.
+const firebaseConfig = {
+    apiKey: "AIzaSyBfoHst0jysIVBvuKX4KjeIoOCcd66u17w",
+    authDomain: "phonebook-tius.firebaseapp.com",
+    projectId: "phonebook-tius",
+    storageBucket: "phonebook-tius.firebasestorage.app",
+    messagingSenderId: "586981446050",
+    appId: "1:586981446050:web:4d93b0a39fc4911d03e2fb"
+};
+
 
 // Firebase instances
 let app;
@@ -125,12 +139,8 @@ function showTab(tabId) {
 async function initializeFirebase() {
     showLoading();
     try {
-        if (Object.keys(firebaseConfig).length === 0) {
-            console.error("Firebase config is empty. Please ensure __firebase_config is provided.");
-            hideLoading();
-            return; // Stop initialization if no config
-        }
-
+        // No need to check for firebaseConfig being empty as it's now hardcoded
+        // Initialize Firebase app with the provided config
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
@@ -146,7 +156,7 @@ async function initializeFirebase() {
                     setupFirestoreListener();
                 }
             } else {
-                // Attempt to sign in anonymously if no initial token
+                // Attempt to sign in anonymously if no initial token (from Canvas env)
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
@@ -448,17 +458,4 @@ function renderContacts() {
                     editingContactId = id;
                     submitButton.textContent = 'Update Contact';
                     cancelEditButton.classList.remove('hidden');
-                    showTab('form'); // Switch to form tab for editing
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to see the form
-                }
-            });
-        });
-
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                showModal("Are you sure you want to delete this contact?", (confirmed) => {
-                    if (confirmed) {
-                        deleteContact(id);
-                    }
-                })
+            
