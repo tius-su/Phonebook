@@ -139,8 +139,8 @@ function showTab(tabId) {
 async function initializeFirebase() {
     showLoading();
     try {
-        // No need to check for firebaseConfig being empty as it's now hardcoded
         // Initialize Firebase app with the provided config
+        // The 'firebaseConfig' variable is already defined at the top of this file.
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
@@ -157,6 +157,7 @@ async function initializeFirebase() {
                 }
             } else {
                 // Attempt to sign in anonymously if no initial token (from Canvas env)
+                // This is needed for Firebase to provide a 'user' object for security rules.
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
@@ -182,7 +183,7 @@ async function initializeFirebase() {
 
 // Real-time listener for contacts, now dependent on loggedInUserId
 function setupFirestoreListener() {
-    // Unsubscribe from previous listener if exists
+    // Unsubscribe from previous listener if exists to prevent multiple listeners
     if (unsubscribeFirestore) {
         unsubscribeFirestore();
     }
@@ -458,4 +459,135 @@ function renderContacts() {
                     editingContactId = id;
                     submitButton.textContent = 'Update Contact';
                     cancelEditButton.classList.remove('hidden');
-            
+                    showTab('form'); // Switch to form tab for editing
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to see the form
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                showModal("Are you sure you want to delete this contact?", (confirmed) => {
+                    if (confirmed) {
+                        deleteContact(id);
+                    }
+                });
+            });
+        });
+    }
+}
+
+function clearForm() {
+    nameInput.value = '';
+    websiteInput.value = '';
+    websiteNotesInput.value = '';
+    notesInput.value = '';
+    phonesContainer.innerHTML = '';
+    emailsContainer.innerHTML = '';
+    connectionsContainer.innerHTML = '';
+    editingContactId = null;
+    submitButton.textContent = 'Add Contact';
+    cancelEditButton.classList.add('hidden');
+    addPhoneInput(); // Add one empty phone input by default
+    addEmailInput(); // Add one empty email input by default
+}
+
+// Form submission handler
+contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const contactData = {
+        name: nameInput.value.trim(),
+        phones: getDynamicInputValues(phonesContainer, 'dynamic-input-tel'),
+        emails: getDynamicInputValues(emailsContainer, 'dynamic-input-email'),
+        website: websiteInput.value.trim(),
+        websiteNotes: websiteNotesInput.value.trim(),
+        notes: notesInput.value.trim(),
+        connections: getConnectionsFromForm()
+    };
+
+    if (contactData.name === '') {
+        showModal("Name cannot be empty!", () => {});
+        return;
+    }
+
+    if (editingContactId) {
+        updateContact(editingContactId, contactData);
+    } else {
+        addContact(contactData);
+    }
+});
+
+// Cancel edit button handler
+cancelEditButton.addEventListener('click', clearForm);
+
+// Add dynamic input buttons event listeners
+addPhoneBtn.addEventListener('click', () => addPhoneInput());
+addEmailBtn.addEventListener('click', () => addEmailInput());
+addConnectionBtn.addEventListener('click', () => addConnectionInput());
+
+// --- Login Form Handler ---
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userId = loginUserIdInput.value.trim();
+    const password = loginPasswordInput.value.trim();
+
+    if (USERS[userId] && USERS[userId] === password) {
+        loggedInUserId = userId; // Set the logged-in user ID from the form
+        loggedInUserIdDisplay.textContent = loggedInUserId;
+        loginError.classList.add('hidden');
+        loginScreen.classList.add('hidden');
+        mainAppScreen.classList.remove('hidden');
+        showTab('list'); // Show contact list by default after login
+        setupFirestoreListener(); // Start listening to data for this logged-in user
+    } else {
+        loginError.classList.remove('hidden');
+    }
+});
+
+// --- Logout Handler ---
+logoutBtn.addEventListener('click', async () => {
+    showLoading();
+    try {
+        if (auth) {
+            await signOut(auth); // Sign out from Firebase Auth
+        }
+        if (unsubscribeFirestore) {
+            unsubscribeFirestore(); // Unsubscribe from Firestore listener
+        }
+        loggedInUserId = null;
+        firebaseAuthUserId = null;
+        contacts = []; // Clear contacts
+        renderContacts(); // Clear UI
+        loginUserIdInput.value = '';
+        loginPasswordInput.value = '';
+        loginScreen.classList.remove('hidden');
+        mainAppScreen.classList.add('hidden');
+        firebaseUserIdDisplay.textContent = "Loading..."; // Reset display
+    } catch (error) {
+        console.error("Error during logout:", error);
+        showModal("Failed to logout: " + error.message, () => {});
+    } finally {
+        hideLoading();
+    }
+});
+
+// --- PWA: Register Service Worker ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+    });
+}
+
+// Initialize Firebase and add initial empty inputs when the window loads (after PWA registration)
+window.onload = () => {
+    initializeFirebase();
+    addPhoneInput(); // Add one phone input field on load
+    addEmailInput(); // Add one email input field on load
+};
