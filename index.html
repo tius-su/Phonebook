@@ -1,180 +1,107 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Phonebook & Email</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Link ke file CSS eksternal -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- PWA: Link ke file manifest -->
+    <title>Phonebook PWA</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    <!-- PWA: Tema warna untuk browser (opsional) -->
-    <meta name="theme-color" content="#2563eb">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-
-    <!-- Login Screen -->
-    <div id="loginScreen" class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login Aplikasi Phonebook</h1>
-        <form id="loginForm" class="space-y-4">
-            <div>
-                <label for="loginUserId" class="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-                <input type="text" id="loginUserId" placeholder="Masukkan User ID Anda" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm">
-            </div>
-            <div>
-                <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="loginPassword" placeholder="Masukkan Password Anda" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm">
-            </div>
-            <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md">
-                Login
-            </button>
-            <p id="loginError" class="text-red-500 text-center text-sm mt-2 hidden">User ID atau Password salah!</p>
-        </form>
+<body>
+    <div id="login-screen" class="screen">
+        <div class="login-container">
+            <h1>Phonebook PWA</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="userid">User ID</label>
+                    <input type="text" id="userid" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
     </div>
 
-    <!-- Main Application Screen -->
-    <div id="mainAppScreen" class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl hidden">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Aplikasi Phonebook & Email</h1>
+    <div id="app-container" class="screen hidden">
+        <header>
+            <h1>Phonebook</h1>
+            <button id="logout-btn" class="icon-btn"><i class="fas fa-sign-out-alt"></i></button>
+        </header>
 
-        <!-- User ID Display -->
-        <div class="mb-4 text-center text-sm text-gray-600">
-            <p>User ID Login Anda: <span id="loggedInUserIdDisplay" class="font-semibold text-purple-600"></span></p>
-            <p>ID Sesi Firebase: <span id="firebaseUserIdDisplay" class="font-semibold text-blue-600">Memuat...</span></p>
+        <div class="tabs">
+            <button id="contacts-tab" class="tab-button active">Contacts</button>
+            <button id="add-contact-tab" class="tab-button">Add Contact</button>
         </div>
 
-        <!-- Tabs for Navigation -->
-        <div class="flex border-b border-gray-200 mb-6">
-            <button id="formTab" class="py-2 px-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent focus:outline-none">
-                Tambah/Edit Kontak
-            </button>
-            <button id="listTab" class="py-2 px-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent focus:outline-none">
-                Daftar Kontak
-            </button>
+        <div id="contacts-screen" class="tab-content active">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search contacts...">
+                <button id="search-btn" class="icon-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div id="contacts-list" class="contacts-list"></div>
         </div>
 
-        <!-- Contact Form Section -->
-        <div id="contactFormSection" class="space-y-4 mb-8 hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Formulir Kontak</h2>
-            <form id="contactForm" class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="name" placeholder="Masukkan nama" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+        <div id="add-contact-screen" class="tab-content">
+            <form id="contact-form">
+                <div class="form-group">
+                    <label for="name">Name*</label>
+                    <input type="text" id="name" required>
                 </div>
 
-                <!-- Dynamic Phone Numbers Section -->
-                <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Nomor Telepon</h3>
-                    <div id="phonesContainer" class="space-y-3">
-                        <!-- Dynamic phone inputs will be added here -->
+                <div class="phone-numbers-container">
+                    <label>Phone Numbers*</label>
+                    <div class="phone-number-group">
+                        <input type="tel" class="phone-number" placeholder="Phone number" required>
+                        <input type="text" class="phone-label" placeholder="Label (e.g., Mobile, Work)">
+                        <button type="button" class="remove-phone-btn icon-btn"><i class="fas fa-times"></i></button>
                     </div>
-                    <button type="button" id="addPhoneBtn"
-                            class="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 shadow-sm text-sm">
-                        + Tambah Nomor Telepon
-                    </button>
+                    <button type="button" id="add-phone-btn" class="secondary-btn">Add Another Phone</button>
                 </div>
 
-                <!-- Dynamic Emails Section -->
-                <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Alamat Email</h3>
-                    <div id="emailsContainer" class="space-y-3">
-                        <!-- Dynamic email inputs will be added here -->
+                <div class="emails-container">
+                    <label>Email Addresses</label>
+                    <div class="email-group">
+                        <input type="email" class="email" placeholder="Email">
+                        <input type="text" class="email-label" placeholder="Label (e.g., Personal, Work)">
+                        <button type="button" class="remove-email-btn icon-btn"><i class="fas fa-times"></i></button>
                     </div>
-                    <button type="button" id="addEmailBtn"
-                            class="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 shadow-sm text-sm">
-                        + Tambah Email
-                    </button>
+                    <button type="button" id="add-email-btn" class="secondary-btn">Add Another Email</button>
                 </div>
 
-                <!-- Website Section -->
-                <div>
-                    <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Situs Web</label>
-                    <input type="url" id="website" placeholder="Masukkan URL situs web (misal: https://example.com)"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm">
-                </div>
-                <div>
-                    <label for="websiteNotes" class="block text-sm font-medium text-gray-700 mb-1">Catatan Situs Web</label>
-                    <textarea id="websiteNotes" placeholder="Catatan terkait situs web (misal: admin login untuk wordpress, username: user, pass: 123)"
-                              rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm"></textarea>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="url" id="website" placeholder="https://">
                 </div>
 
-                <!-- Dynamic Connections Section -->
-                <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Koneksi & Akun Terkait</h3>
-                    <div id="connectionsContainer" class="space-y-3">
-                        <!-- Dynamic connection inputs will be added here -->
-                    </div>
-                    <button type="button" id="addConnectionBtn"
-                            class="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 shadow-sm text-sm">
-                        + Tambah Koneksi
-                    </button>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" rows="3"></textarea>
                 </div>
 
-                <div>
-                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Catatan Lain</label>
-                    <textarea id="notes" placeholder="Catatan tambahan tentang kontak ini"
-                              rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 shadow-sm"></textarea>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="3" placeholder="Additional information..."></textarea>
                 </div>
 
-                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                    <button type="submit" id="submitButton"
-                            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md">
-                        Tambah Kontak
-                    </button>
-                    <button type="button" id="cancelEditButton"
-                            class="flex-1 bg-gray-400 text-white py-2 px-4 rounded-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 shadow-md hidden">
-                        Batal Edit
-                    </button>
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input type="text" id="tags" placeholder="Comma separated tags (friend, work, family)">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="save-contact-btn">Save Contact</button>
+                    <button type="button" id="cancel-btn" class="secondary-btn">Cancel</button>
                 </div>
             </form>
         </div>
-
-        <!-- Contact List Section -->
-        <div id="contactListSection" class="space-y-4 hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Daftar Kontak</h2>
-            <div id="contactList" class="space-y-4 contact-list-container max-h-96 overflow-y-auto pr-2">
-                <!-- Contacts will be rendered here -->
-                <p class="text-center text-gray-500" id="noContactsMessage">Tidak ada kontak. Tambahkan yang baru!</p>
-            </div>
-        </div>
-
-        <!-- Logout Button -->
-        <div class="mt-8 text-center">
-            <button id="logoutBtn" class="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 shadow-md">
-                Logout
-            </button>
-        </div>
-
-        <!-- Loading Spinner -->
-        <div id="loadingSpinner" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-        </div>
-
-        <!-- Custom Confirmation Modal -->
-        <div id="customModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-                <p id="modalMessage" class="text-lg font-medium text-gray-800 mb-6"></p>
-                <div class="flex justify-center space-x-4">
-                    <button id="modalConfirmBtn" class="bg-red-600 text-white py-2 px-5 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-md">
-                        Ya
-                    </button>
-                    <button id="modalCancelBtn" class="bg-gray-400 text-white py-2 px-5 rounded-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 shadow-md">
-                        Batal
-                    </button>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Link ke file JavaScript eksternal -->
-    <script type="module" src="script.js"></script>
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 {
-    "name": "Phonebook App",
+    "name": "Phonebook PWA",
     "short_name": "Phonebook",
-    "description": "Aplikasi Phonebook & Email pribadi Anda.",
-    "start_url": "./index.html",
+    "start_url": ".",
     "display": "standalone",
-    "background_color": "#f0f2f5",
-    "theme_color": "#2563eb",
+    "background_color": "#ffffff",
+    "theme_color": "#4285f4",
+    "description": "A modern phonebook application with Firebase integration.",
     "icons": [
         {
             "src": "icon-192x192.png",
