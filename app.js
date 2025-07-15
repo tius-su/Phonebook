@@ -5,16 +5,16 @@ import {
     ref, 
     set, 
     get, 
-    child, 
+    child, // Ini seharusnya dari firebase-database.js
     push, 
     update, 
     remove,
-    query,
-    orderByChild,
-    equalTo,
-    startAt,
-    endAt
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"; // Perbaikan: getAuth, signInWithEmailAndPassword, signOut
+    query, // Ini seharusnya dari firebase-database.js
+    orderByChild, // Ini seharusnya dari firebase-database.js
+    equalTo, // Ini seharusnya dari firebase-database.js
+    startAt, // Ini seharusnya dari firebase-database.js
+    endAt // Ini seharusnya dari firebase-database.js
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; // Perbaikan: Pastikan ini adalah sumber yang benar
 
 import {
     getAuth,
