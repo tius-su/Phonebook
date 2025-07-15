@@ -3,9 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Global variables provided by the environment (these will be available here)
-// NOTE: __app_id and __initial_auth_token are still used as they are specific to the Canvas environment.
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+// Global variables provided by the Canvas environment (if running there)
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
 // Your web app's Firebase configuration - THIS IS NOW HARDCODED WITH YOUR PROVIDED VALUES
@@ -15,11 +13,15 @@ const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial
 const firebaseConfig = {
     apiKey: "AIzaSyBfoHst0jysIVBvuKX4KjeIoOCcd66u17w",
     authDomain: "phonebook-tius.firebaseapp.com",
-    projectId: "phonebook-tius",
+    projectId: "phonebook-tius", // Pastikan ini cocok dengan Project ID Firebase Anda
     storageBucket: "phonebook-tius.firebasestorage.app",
     messagingSenderId: "586981446050",
     appId: "1:586981446050:web:4d93b0a39fc4911d03e2fb"
 };
+
+// *** PERBAIKAN PENTING DI SINI ***
+// Gunakan projectId dari firebaseConfig sebagai appId agar jalur Firestore cocok dengan aturan.
+const appId = firebaseConfig.projectId;
 
 
 // Firebase instances
@@ -40,7 +42,7 @@ const loginPasswordInput = document.getElementById('loginPassword');
 const loginError = document.getElementById('loginError');
 const mainAppScreen = document.getElementById('mainAppScreen');
 const loggedInUserIdDisplay = document.getElementById('loggedInUserIdDisplay');
-const firebaseUserIdDisplay 8= document.getElementById('firebaseUserIdDisplay');
+const firebaseUserIdDisplay = document.getElementById('firebaseUserIdDisplay');
 const formTab = document.getElementById('formTab');
 const listTab = document.getElementById('listTab');
 const contactFormSection = document.getElementById('contactFormSection');
@@ -194,6 +196,7 @@ function setupFirestoreListener() {
     }
 
     // Data path now uses the loggedInUserId from the form
+    // It will use 'phonebook-tius' as the appId, matching your Firebase project ID.
     const contactsCollectionRef = collection(db, `artifacts/${appId}/users_data/${loggedInUserId}/contacts`);
     const q = query(contactsCollectionRef); // No orderBy to avoid index issues
 
