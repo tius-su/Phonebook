@@ -15,11 +15,11 @@
             <form id="login-form">
                 <div class="form-group">
                     <label for="userid">User ID</label>
-                    <input type="text" id="userid" required>
+                    <input type="text" id="userid" required class="large-input">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password" required class="large-input">
                 </div>
                 <button type="submit">Login</button>
             </form>
@@ -39,8 +39,13 @@
 
         <div id="contacts-screen" class="tab-content active">
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search contacts...">
+                <input type="text" id="search-input" placeholder="Cari kontak..." class="large-input">
                 <button id="search-btn" class="icon-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <!-- Tombol pilihan tampilan -->
+            <div class="view-options">
+                <button id="grid-view-btn" class="icon-btn active" title="Tampilan Grid"><i class="fas fa-th-large"></i></button>
+                <button id="list-view-btn" class="icon-btn" title="Tampilan Daftar"><i class="fas fa-list"></i></button>
             </div>
             <div id="contacts-list" class="contacts-list"></div>
         </div>
@@ -48,53 +53,53 @@
         <div id="add-contact-screen" class="tab-content">
             <form id="contact-form">
                 <div class="form-group">
-                    <label for="name">Name*</label>
-                    <input type="text" id="name" required>
+                    <label for="name">Nama*</label>
+                    <input type="text" id="name" required class="large-input">
                 </div>
 
                 <div class="phone-numbers-container">
-                    <label>Phone Numbers*</label>
+                    <label>Nomor Telepon*</label>
                     <div class="phone-number-group">
-                        <input type="tel" class="phone-number" placeholder="Phone number" required>
-                        <input type="text" class="phone-label" placeholder="Label (e.g., Mobile, Work)">
+                        <input type="tel" class="phone-number" placeholder="Nomor telepon" required>
+                        <input type="text" class="phone-label" placeholder="Label (misalnya, Seluler, Kantor)">
                         <button type="button" class="remove-phone-btn icon-btn"><i class="fas fa-times"></i></button>
                     </div>
-                    <button type="button" id="add-phone-btn" class="secondary-btn">Add Another Phone</button>
+                    <button type="button" id="add-phone-btn" class="secondary-btn">Tambah Nomor Telepon Lain</button>
                 </div>
 
                 <div class="emails-container">
-                    <label>Email Addresses</label>
+                    <label>Alamat Email</label>
                     <div class="email-group">
                         <input type="email" class="email" placeholder="Email">
-                        <input type="text" class="email-label" placeholder="Label (e.g., Personal, Work)">
+                        <input type="text" class="email-label" placeholder="Label (misalnya, Pribadi, Kantor)">
                         <button type="button" class="remove-email-btn icon-btn"><i class="fas fa-times"></i></button>
                     </div>
-                    <button type="button" id="add-email-btn" class="secondary-btn">Add Another Email</button>
+                    <button type="button" id="add-email-btn" class="secondary-btn">Tambah Email Lain</button>
                 </div>
 
                 <div class="form-group">
                     <label for="website">Website</label>
-                    <input type="url" id="website" placeholder="https://">
+                    <input type="url" id="website" placeholder="https://" class="large-input">
                 </div>
 
                 <div class="form-group">
-                    <label for="address">Address</label>
-                    <textarea id="address" rows="3"></textarea>
+                    <label for="address">Alamat</label>
+                    <textarea id="address" rows="3" class="large-input"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="notes">Notes</label>
-                    <textarea id="notes" rows="3" placeholder="Additional information..."></textarea>
+                    <label for="notes">Catatan</label>
+                    <textarea id="notes" rows="3" placeholder="Informasi tambahan..." class="large-input"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="tags">Tags</label>
-                    <input type="text" id="tags" placeholder="Comma separated tags (friend, work, family)">
+                    <label for="tags">Tag</label>
+                    <input type="text" id="tags" placeholder="Tag dipisahkan koma (teman, kerja, keluarga)" class="large-input">
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" id="save-contact-btn">Save Contact</button>
-                    <button type="button" id="cancel-btn" class="secondary-btn">Cancel</button>
+                    <button type="submit" id="save-contact-btn">Simpan Kontak</button>
+                    <button type="button" id="cancel-btn" class="secondary-btn">Batal</button>
                 </div>
             </form>
         </div>
