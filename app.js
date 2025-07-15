@@ -57,6 +57,11 @@ const addEmailBtn = document.getElementById('add-email-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const toast = document.getElementById('toast');
 
+// Elemen baru untuk pilihan tampilan
+const gridViewBtn = document.getElementById('grid-view-btn');
+const listViewBtn = document.getElementById('list-view-btn');
+
+
 // Status pengguna saat ini
 let currentUser = null;
 let currentContactId = null;
@@ -78,9 +83,8 @@ function init() {
     loginForm.addEventListener('submit', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
     contactsTab.addEventListener('click', () => switchTab('contacts'));
-    // Perubahan di sini: Panggil resetForm() saat mengklik tab 'Add Contact'
     addContactTab.addEventListener('click', () => {
-        resetForm(); // Reset form sebelum beralih ke tab Add Contact
+        resetForm(); 
         switchTab('add-contact');
     });
     contactForm.addEventListener('submit', saveContact);
@@ -91,6 +95,10 @@ function init() {
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') searchContacts();
     });
+
+    // Event listeners untuk tombol pilihan tampilan
+    gridViewBtn.addEventListener('click', () => setView('grid'));
+    listViewBtn.addEventListener('click', () => setView('list'));
 
     // Inisialisasi PWA
     if ('serviceWorker' in navigator) {
@@ -105,6 +113,20 @@ function init() {
         });
     }
 }
+
+// Mengatur tampilan (grid atau list)
+function setView(viewType) {
+    if (viewType === 'grid') {
+        contactsList.classList.remove('list-view');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    } else if (viewType === 'list') {
+        contactsList.classList.add('list-view');
+        gridViewBtn.classList.remove('active');
+        listViewBtn.classList.add('active');
+    }
+}
+
 
 // Menampilkan layar login
 function showLogin() {
@@ -131,7 +153,6 @@ function switchTab(tab) {
         addContactTab.classList.add('active');
         contactsScreen.classList.remove('active');
         addContactScreen.classList.add('active');
-        // Hapus panggilan resetForm() dari sini, karena sudah dipanggil saat klik tab 'Add Contact'
     }
 }
 
@@ -142,8 +163,6 @@ async function handleLogin(e) {
     const password = document.getElementById('password').value;
 
     try {
-        // Menggunakan User ID langsung sebagai email karena Firebase Auth mengharapkannya dalam format email
-        // Pastikan 'userid' yang dimasukkan adalah alamat email yang valid dan terdaftar di Firebase Auth
         const email = userid; 
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         currentUser = userCredential.user;
@@ -151,7 +170,6 @@ async function handleLogin(e) {
         loadContacts();
         showToast('Login berhasil!');
     } catch (error) {
-        // Menampilkan pesan error yang lebih informatif
         let errorMessage = 'Terjadi kesalahan saat login.';
         if (error.code === 'auth/user-not-found') {
             errorMessage = 'Pengguna tidak ditemukan. Periksa kembali User ID Anda.';
@@ -198,7 +216,8 @@ async function loadContacts() {
         } else {
             contactsList.innerHTML = '<p class="no-contacts">Tidak ada kontak ditemukan. Tambahkan kontak pertama Anda!</p>';
         }
-    } catch (error) {
+    }
+    catch (error) {
         showToast(`Gagal memuat kontak: ${error.message}`, true);
     }
 }
@@ -379,16 +398,10 @@ async function editContact(contactId) {
             const contact = snapshot.val();
             currentContactId = contactId;
             
-            // Panggil resetForm() terlebih dahulu untuk membersihkan form
-            // dan memastikan struktur dasar (satu field telepon/email)
             resetForm(); 
 
-            // Set form values
             document.getElementById('name').value = contact.name;
             
-            // Set phone numbers
-            // Karena resetForm sudah memastikan ada satu field, kita isi yang pertama
-            // dan tambahkan sisanya jika ada
             if (contact.phones && contact.phones.length > 0) {
                 const firstPhoneGroup = document.querySelector('.phone-number-group');
                 if (firstPhoneGroup) { 
@@ -398,7 +411,6 @@ async function editContact(contactId) {
                 
                 for (let i = 1; i < contact.phones.length; i++) {
                     addPhoneField();
-                    // Pastikan elemen baru sudah ada sebelum mencoba mengisinya
                     const phoneGroup = document.querySelectorAll('.phone-number-group')[i];
                     if (phoneGroup) { 
                         phoneGroup.querySelector('.phone-number').value = contact.phones[i].number;
@@ -407,8 +419,6 @@ async function editContact(contactId) {
                 }
             }
             
-            // Set emails
-            // Sama seperti telepon, isi yang pertama dan tambahkan sisanya
             if (contact.emails && contact.emails.length > 0) {
                 const firstEmailGroup = document.querySelector('.email-group');
                 if (firstEmailGroup) { 
@@ -418,7 +428,6 @@ async function editContact(contactId) {
                 
                 for (let i = 1; i < contact.emails.length; i++) {
                     addEmailField();
-                    // Pastikan elemen baru sudah ada sebelum mencoba mengisinya
                     const emailGroup = document.querySelectorAll('.email-group')[i];
                     if (emailGroup) { 
                         emailGroup.querySelector('.email').value = contact.emails[i].address;
@@ -432,7 +441,6 @@ async function editContact(contactId) {
             document.getElementById('notes').value = contact.notes || '';
             document.getElementById('tags').value = contact.tags || '';
             
-            // Terakhir, beralih ke tab 'add-contact'
             switchTab('add-contact');
         }
     } catch (error) {
@@ -547,20 +555,18 @@ function addEmailField() {
 // Mereset form
 function resetForm() {
     contactForm.reset();
-    currentContactId = null; // Penting untuk mengatur ini ke null saat mereset form
+    currentContactId = null; 
 
-    // Reset nomor telepon (pastikan setidaknya satu field ada dan bersihkan)
     const phoneGroups = document.querySelectorAll('.phone-number-group');
     phoneGroups.forEach((group, index) => {
-        if (index > 0) { // Hapus semua kecuali yang pertama
+        if (index > 0) { 
             group.remove();
-        } else { // Bersihkan yang pertama
+        } else { 
             group.querySelector('.phone-number').value = '';
             group.querySelector('.phone-label').value = '';
         }
     });
 
-    // Jika entah bagaimana grup telepon awal terhapus, tambahkan kembali (defensif)
     if (document.querySelectorAll('.phone-number-group').length === 0) {
         addPhoneField(); 
         const newFirstPhoneGroup = document.querySelector('.phone-number-group');
@@ -570,18 +576,16 @@ function resetForm() {
         }
     }
 
-    // Reset email (pastikan setidaknya satu field ada dan bersihkan)
     const emailGroups = document.querySelectorAll('.email-group');
     emailGroups.forEach((group, index) => {
-        if (index > 0) { // Hapus semua kecuali yang pertama
+        if (index > 0) { 
             group.remove();
-        } else { // Bersihkan yang pertama
+        } else { 
             group.querySelector('.email').value = '';
             group.querySelector('.email-label').value = '';
         }
     });
 
-    // Jika entah bagaimana grup email awal terhapus, tambahkan kembali (defensif)
     if (document.querySelectorAll('.email-group').length === 0) {
         addEmailField(); 
         const newFirstEmailGroup = document.querySelector('.email-group');
