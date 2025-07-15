@@ -97,8 +97,18 @@ function init() {
     });
 
     // Event listeners untuk tombol pilihan tampilan
-    gridViewBtn.addEventListener('click', () => setView('grid'));
-    listViewBtn.addEventListener('click', () => setView('list'));
+    // Pastikan elemen ditemukan sebelum menambahkan event listener
+    if (gridViewBtn) {
+        gridViewBtn.addEventListener('click', () => setView('grid'));
+    } else {
+        console.error('Elemen gridViewBtn tidak ditemukan!');
+    }
+    if (listViewBtn) {
+        listViewBtn.addEventListener('click', () => setView('list'));
+    } else {
+        console.error('Elemen listViewBtn tidak ditemukan!');
+    }
+
 
     // Inisialisasi PWA
     if ('serviceWorker' in navigator) {
@@ -116,14 +126,22 @@ function init() {
 
 // Mengatur tampilan (grid atau list)
 function setView(viewType) {
+    console.log(`setView dipanggil dengan tipe: ${viewType}`);
+    if (!contactsList) {
+        console.error('Elemen contactsList tidak ditemukan saat setView dipanggil!');
+        return;
+    }
+
     if (viewType === 'grid') {
         contactsList.classList.remove('list-view');
-        gridViewBtn.classList.add('active');
-        listViewBtn.classList.remove('active');
+        if (gridViewBtn) gridViewBtn.classList.add('active');
+        if (listViewBtn) listViewBtn.classList.remove('active');
+        console.log('Tampilan diubah ke Grid');
     } else if (viewType === 'list') {
         contactsList.classList.add('list-view');
-        gridViewBtn.classList.remove('active');
-        listViewBtn.classList.add('active');
+        if (gridViewBtn) gridViewBtn.classList.remove('active');
+        if (listViewBtn) listViewBtn.classList.add('active');
+        console.log('Tampilan diubah ke List');
     }
 }
 
@@ -216,6 +234,8 @@ async function loadContacts() {
         } else {
             contactsList.innerHTML = '<p class="no-contacts">Tidak ada kontak ditemukan. Tambahkan kontak pertama Anda!</p>';
         }
+        // Setelah memuat kontak, pastikan tampilan awal diatur (misalnya, grid)
+        setView('grid'); 
     }
     catch (error) {
         showToast(`Gagal memuat kontak: ${error.message}`, true);
@@ -609,3 +629,4 @@ function showToast(message, isError = false) {
 
 // Inisialisasi aplikasi saat DOM dimuat
 document.addEventListener('DOMContentLoaded', init);
+
