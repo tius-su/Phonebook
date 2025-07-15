@@ -5,16 +5,16 @@ import {
     ref, 
     set, 
     get, 
-    child, // Ini seharusnya dari firebase-database.js
+    child, 
     push, 
     update, 
     remove,
-    query, // Ini seharusnya dari firebase-database.js
-    orderByChild, // Ini seharusnya dari firebase-database.js
-    equalTo, // Ini seharusnya dari firebase-database.js
-    startAt, // Ini seharusnya dari firebase-database.js
-    endAt // Ini seharusnya dari firebase-database.js
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; // Perbaikan: Pastikan ini adalah sumber yang benar
+    query, 
+    orderByChild, 
+    equalTo, 
+    startAt, 
+    endAt
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 import {
     getAuth,
@@ -78,7 +78,11 @@ function init() {
     loginForm.addEventListener('submit', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
     contactsTab.addEventListener('click', () => switchTab('contacts'));
-    addContactTab.addEventListener('click', () => switchTab('add-contact'));
+    // Perubahan di sini: Panggil resetForm() saat mengklik tab 'Add Contact'
+    addContactTab.addEventListener('click', () => {
+        resetForm(); // Reset form sebelum beralih ke tab Add Contact
+        switchTab('add-contact');
+    });
     contactForm.addEventListener('submit', saveContact);
     addPhoneBtn.addEventListener('click', addPhoneField);
     addEmailBtn.addEventListener('click', addEmailField);
@@ -126,8 +130,8 @@ function switchTab(tab) {
         contactsTab.classList.remove('active');
         addContactTab.classList.add('active');
         contactsScreen.classList.remove('active');
-        addContactScreen.classList.add('active'); // Ini membuat addContactScreen terlihat
-        resetForm(); // Ini dipanggil segera setelah membuatnya terlihat.
+        addContactScreen.classList.add('active');
+        // Hapus panggilan resetForm() dari sini, karena sudah dipanggil saat klik tab 'Add Contact'
     }
 }
 
@@ -350,15 +354,16 @@ async function saveContact(e) {
             // Memperbarui kontak yang sudah ada
             await update(child(dbRef, currentContactId), contactData);
             showToast('Kontak berhasil diperbarui!');
+            switchTab('contacts'); // Kembali ke daftar kontak setelah update
         } else {
             // Menambahkan kontak baru
             const newContactRef = push(dbRef);
             await set(newContactRef, contactData);
             showToast('Kontak berhasil ditambahkan!');
+            resetForm(); // Reset form hanya setelah menambahkan kontak baru
+            switchTab('contacts'); // Kembali ke daftar kontak setelah tambah
         }
         
-        resetForm();
-        switchTab('contacts');
     } catch (error) {
         showToast(`Gagal menyimpan kontak: ${error.message}`, true);
     }
@@ -374,25 +379,28 @@ async function editContact(contactId) {
             const contact = snapshot.val();
             currentContactId = contactId;
             
+            // Panggil resetForm() terlebih dahulu untuk membersihkan form
+            // dan memastikan struktur dasar (satu field telepon/email)
+            resetForm(); 
+
             // Set form values
             document.getElementById('name').value = contact.name;
             
-            // Clear existing phone and email fields (except the first one, which will be cleared by resetForm)
-            document.querySelectorAll('.phone-number-group:not(:first-child)').forEach(el => el.remove());
-            document.querySelectorAll('.email-group:not(:first-child)').forEach(el => el.remove());
-            
             // Set phone numbers
+            // Karena resetForm sudah memastikan ada satu field, kita isi yang pertama
+            // dan tambahkan sisanya jika ada
             if (contact.phones && contact.phones.length > 0) {
                 const firstPhoneGroup = document.querySelector('.phone-number-group');
-                if (firstPhoneGroup) { // Pastikan elemen ada sebelum mengaksesnya
+                if (firstPhoneGroup) { 
                     firstPhoneGroup.querySelector('.phone-number').value = contact.phones[0].number;
                     firstPhoneGroup.querySelector('.phone-label').value = contact.phones[0].label || '';
                 }
                 
                 for (let i = 1; i < contact.phones.length; i++) {
                     addPhoneField();
+                    // Pastikan elemen baru sudah ada sebelum mencoba mengisinya
                     const phoneGroup = document.querySelectorAll('.phone-number-group')[i];
-                    if (phoneGroup) { // Pastikan elemen ada sebelum mengaksesnya
+                    if (phoneGroup) { 
                         phoneGroup.querySelector('.phone-number').value = contact.phones[i].number;
                         phoneGroup.querySelector('.phone-label').value = contact.phones[i].label || '';
                     }
@@ -400,17 +408,19 @@ async function editContact(contactId) {
             }
             
             // Set emails
+            // Sama seperti telepon, isi yang pertama dan tambahkan sisanya
             if (contact.emails && contact.emails.length > 0) {
                 const firstEmailGroup = document.querySelector('.email-group');
-                if (firstEmailGroup) { // Pastikan elemen ada sebelum mengaksesnya
+                if (firstEmailGroup) { 
                     firstEmailGroup.querySelector('.email').value = contact.emails[0].address;
                     firstEmailGroup.querySelector('.email-label').value = contact.emails[0].label || '';
                 }
                 
                 for (let i = 1; i < contact.emails.length; i++) {
                     addEmailField();
+                    // Pastikan elemen baru sudah ada sebelum mencoba mengisinya
                     const emailGroup = document.querySelectorAll('.email-group')[i];
-                    if (emailGroup) { // Pastikan elemen ada sebelum mengaksesnya
+                    if (emailGroup) { 
                         emailGroup.querySelector('.email').value = contact.emails[i].address;
                         emailGroup.querySelector('.email-label').value = contact.emails[i].label || '';
                     }
@@ -422,6 +432,7 @@ async function editContact(contactId) {
             document.getElementById('notes').value = contact.notes || '';
             document.getElementById('tags').value = contact.tags || '';
             
+            // Terakhir, beralih ke tab 'add-contact'
             switchTab('add-contact');
         }
     } catch (error) {
@@ -431,8 +442,6 @@ async function editContact(contactId) {
 
 // Menghapus kontak
 async function deleteContact(contactId) {
-    // Mengganti confirm() dengan modal kustom jika diperlukan di lingkungan produksi
-    // Untuk tujuan debugging atau pengembangan, confirm() masih bisa digunakan
     if (!confirm('Apakah Anda yakin ingin menghapus kontak ini?')) return;
     
     try {
@@ -538,8 +547,8 @@ function addEmailField() {
 // Mereset form
 function resetForm() {
     contactForm.reset();
-    currentContactId = null;
-    
+    currentContactId = null; // Penting untuk mengatur ini ke null saat mereset form
+
     // Reset nomor telepon (pastikan setidaknya satu field ada dan bersihkan)
     const phoneGroups = document.querySelectorAll('.phone-number-group');
     phoneGroups.forEach((group, index) => {
@@ -553,8 +562,7 @@ function resetForm() {
 
     // Jika entah bagaimana grup telepon awal terhapus, tambahkan kembali (defensif)
     if (document.querySelectorAll('.phone-number-group').length === 0) {
-        addPhoneField(); // Fungsi ini sudah menambahkan grup baru dengan event listener
-        // Dan kemudian bersihkan, karena sekarang itu satu-satunya
+        addPhoneField(); 
         const newFirstPhoneGroup = document.querySelector('.phone-number-group');
         if (newFirstPhoneGroup) {
             newFirstPhoneGroup.querySelector('.phone-number').value = '';
@@ -575,8 +583,7 @@ function resetForm() {
 
     // Jika entah bagaimana grup email awal terhapus, tambahkan kembali (defensif)
     if (document.querySelectorAll('.email-group').length === 0) {
-        addEmailField(); // Fungsi ini sudah menambahkan grup baru dengan event listener
-        // Dan kemudian bersihkan, karena sekarang itu satu-satunya
+        addEmailField(); 
         const newFirstEmailGroup = document.querySelector('.email-group');
         if (newFirstEmailGroup) {
             newFirstEmailGroup.querySelector('.email').value = '';
