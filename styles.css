@@ -64,7 +64,7 @@ body {
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 2rem; /* Ini membuat teks di dalam input sangat besar */
+    font-size: 2rem; /* Ini membuat teks di dalam input sangat besar. Anda mungkin ingin menyesuaikannya. */
 }
 
 .form-group textarea {
@@ -103,6 +103,16 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Gaya untuk tombol tampilan aktif */
+.icon-btn.active {
+    background-color: var(--secondary-color); /* Warna yang berbeda untuk menunjukkan aktif */
+    color: white;
+}
+
+.icon-btn.active:hover {
+    background-color: #2e8b4e; /* Warna hover untuk tombol aktif */
 }
 
 header {
@@ -169,10 +179,28 @@ header h1 {
     border-radius: 0 4px 4px 0;
 }
 
+/* Gaya untuk opsi tampilan tombol */
+.view-options {
+    display: flex;
+    justify-content: flex-end; /* Posisikan tombol ke kanan */
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
 .contacts-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
+}
+
+/* Gaya untuk tampilan daftar (list view) */
+.contacts-list.list-view {
+    display: block; /* Ubah menjadi blok untuk tampilan daftar */
+}
+
+.contacts-list.list-view .contact-card {
+    margin-bottom: 1rem; /* Tambahkan margin bawah antar kartu dalam tampilan daftar */
+    width: 100%; /* Pastikan kartu mengambil lebar penuh */
 }
 
 .contact-card {
@@ -228,12 +256,13 @@ header h1 {
     gap: 0.5rem;
     margin-bottom: 0.5rem;
     align-items: center;
+    width: 100%; /* Pastikan grup flex mengambil lebar penuh */
 }
 
-/* Perubahan di sini untuk memperbesar kolom input telepon dan email */
+/* Perubahan utama di sini untuk memperbesar kolom input telepon dan email */
 .phone-number-group .phone-number,
 .email-group .email {
-    flex: 4; /* Membuat input nomor telepon/email 4 kali lebih lebar dari label */
+    flex: 6; /* Membuat input nomor telepon/email 6 kali lebih lebar dari label */
 }
 
 .phone-number-group .phone-label,
@@ -241,14 +270,13 @@ header h1 {
     flex: 1; /* Memberikan proporsi yang lebih kecil untuk label */
 }
 
-/* Pastikan input dalam grup flex juga mengambil padding dan border-radius dari .form-group input */
+/* Aturan umum untuk input dalam grup telepon/email */
 .phone-number-group input,
 .email-group input {
-    /* Properti ini sudah diatur oleh .form-group input, tapi kita pastikan flex tidak mengganggu */
     padding: 0.75rem; 
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 2rem; /* Tetap menggunakan ukuran font besar yang Anda tentukan */
+    font-size: 1rem; /* Mengurangi ukuran font agar lebih proporsional */
 }
 
 
@@ -285,6 +313,7 @@ header h1 {
     .phone-number-group,
     .email-group {
         flex-direction: column; /* Pada layar kecil, tumpuk input */
+        align-items: stretch; /* Agar item mengisi lebar penuh saat bertumpuk */
     }
     
     .phone-number-group input,
@@ -293,5 +322,3 @@ header h1 {
         flex: none; /* Nonaktifkan flex pada layar kecil */
     }
 }
-
-
