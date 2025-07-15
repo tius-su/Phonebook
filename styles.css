@@ -64,7 +64,7 @@ body {
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 2rem;
+    font-size: 2rem; /* Ini membuat teks di dalam input sangat besar */
 }
 
 .form-group textarea {
@@ -230,15 +230,27 @@ header h1 {
     align-items: center;
 }
 
-.phone-number-group input,
-.email-group input {
-    flex: 1;
-}
-
+/* Perubahan di sini untuk memperbesar kolom input telepon dan email */
 .phone-number-group .phone-number,
 .email-group .email {
-    flex: 2;
+    flex: 4; /* Membuat input nomor telepon/email 4 kali lebih lebar dari label */
 }
+
+.phone-number-group .phone-label,
+.email-group .email-label {
+    flex: 1; /* Memberikan proporsi yang lebih kecil untuk label */
+}
+
+/* Pastikan input dalam grup flex juga mengambil padding dan border-radius dari .form-group input */
+.phone-number-group input,
+.email-group input {
+    /* Properti ini sudah diatur oleh .form-group input, tapi kita pastikan flex tidak mengganggu */
+    padding: 0.75rem; 
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 2rem; /* Tetap menggunakan ukuran font besar yang Anda tentukan */
+}
+
 
 .form-actions {
     display: flex;
@@ -272,12 +284,14 @@ header h1 {
     
     .phone-number-group,
     .email-group {
-        flex-direction: column;
+        flex-direction: column; /* Pada layar kecil, tumpuk input */
     }
     
     .phone-number-group input,
     .email-group input {
-        width: 100%;
+        width: 100%; /* Pastikan mengambil lebar penuh saat ditumpuk */
+        flex: none; /* Nonaktifkan flex pada layar kecil */
     }
 }
+
 
